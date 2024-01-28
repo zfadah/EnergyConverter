@@ -45,6 +45,7 @@ open class TileEnergyConverter : TileEntity(), IEnergyHandler, IBasicEnergyConta
 
     //RF Part
     override fun canConnectEnergy(p0: ForgeDirection?): Boolean {
+
         return if (p0 == null) {
             false
         } else {
