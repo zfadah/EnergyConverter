@@ -157,8 +157,17 @@ open class TileEnergyConverter : TileEntity(), IEnergyHandler, IBasicEnergyConta
                     if (metaTileEntity is GT_MetaPipeEntity_Cable) {
                         val mAmperage = metaTileEntity.mAmperage
                         val mVoltage = metaTileEntity.mVoltage
-                        val mUsedAmperage = Util.emitEnergyToNetwork(mVoltage,mAmperage,this)
-                        drainEnergyUnits(ForgeDirection.getOrientation(index),mVoltage,mUsedAmperage)
+                        val amp = currentOutputAmperage[index]
+                        if ( amp == 0L){
+                            currentOutputAmperage[index] = Util.emitEnergyToNetwork(mVoltage,mAmperage,this)
+                        }else{
+                            if (drainEnergyUnits(ForgeDirection.getOrientation(index),mVoltage,amp)){
+                                currentOutputAmperage[index] = Util.emitEnergyToNetwork(mVoltage,mAmperage,this)
+                            }
+                        }
+
+//                        val mUsedAmperage = Util.emitEnergyToNetwork(mVoltage,mAmperage,this)
+//                        drainEnergyUnits(ForgeDirection.getOrientation(index),mVoltage,mUsedAmperage)
                     }
 
                 }
@@ -625,6 +634,7 @@ open class TileEnergyConverter : TileEntity(), IEnergyHandler, IBasicEnergyConta
     }
 
     override fun sendBlockEvent(aID: Byte, aValue: Byte) {
+
         GT_Values.NW.sendPacketToAllPlayersInRange(
             worldObj,
             GT_Packet_Block_Event(xCoord, yCoord.toShort(), zCoord, aID, aValue),
